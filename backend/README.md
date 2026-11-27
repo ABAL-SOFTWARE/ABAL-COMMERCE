@@ -13,20 +13,18 @@ cd <CARPETA_DEL_REPO>
 ```
 
 ## 2. Configurar variables de entorno
-Copia el archivo de ejemplo:
+Copia el archivo de ejemplo y genera los secretos obligatorios directamente en `.env`:
 ```bash
 cp .env.example .env
+sed -i.bak \
+  -e "s|^DB_PASSWORD=.*|DB_PASSWORD=$(openssl rand -hex 16)|" \
+  -e "s|^AUTH_JWT_SECRET=.*|AUTH_JWT_SECRET=$(openssl rand -base64 48 | tr -d '\n')|" \
+  -e "s|^KRATOS_SECRETS_CIPHER=.*|KRATOS_SECRETS_CIPHER=$(openssl rand -hex 16)|" \
+  -e "s|^KRATOS_SECRETS_COOKIE=.*|KRATOS_SECRETS_COOKIE=$(openssl rand -hex 32)|" \
+  .env && rm -f .env.bak
 ```
 
-Genera los secretos obligatorios:
-```bash
-echo "DB_PASSWORD=$(openssl rand -hex 16)"
-echo "AUTH_JWT_SECRET=$(openssl rand -base64 48)"
-echo "KRATOS_SECRETS_CIPHER=$(openssl rand -hex 16)"
-echo "KRATOS_SECRETS_COOKIE=$(openssl rand -hex 32)"
-```
-
-Edita `.env` y pega esos valores junto con tu `STRIPE_SECRET_KEY`, `CORS_ORIGINS`, `KRATOS_SMTP_URI` (opcional si desactivas email OTP con `SIGNUP_EMAIL_ENABLED=false`) y `ADMIN_PASSWORD`.
+Edita `.env` si necesitas ajustar `STRIPE_SECRET_KEY`, `CORS_ORIGINS`, `KRATOS_SMTP_URI` (o desactivar email OTP con `SIGNUP_EMAIL_ENABLED=false`) y `ADMIN_PASSWORD`.
 
 ## 3. Levantar el stack
 ```bash
